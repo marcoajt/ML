@@ -1,0 +1,432 @@
+# Introdução
+
+Olá, tudo bem?
+
+Neste primeiro curso de Machine Learning e Classificação, analisaremos quatro projetos e conjuntos de dados diferentes, sobre os quais tentaremos classificar informações em duas categorias distintas — isto é, usaremos algoritmos de *machine learning* para classificação, estimadores capazes de analisar a imagem de um animal e conseguir afirmar que se trata de um porco ou cachorro. Trata-se de um exemplo simples para que possamos introduzir o conceito de classificação e seu processo de estudo, treino e teste.
+
+Um dos projetos é analisar se usuários que acessaram determinadas páginas de um site irão ou não comprar um produto específico. Então, estamos classificando entre duas opções de classes: "comprar ou não comprar", "sim" e "não", ou numericamente falando, "0" ou "1".
+
+Outro projeto envolve duas *features*: imagine que queremos criar um blog ou site, mas não temos os conhecimentos necessários para fazer isso de forma autônoma. Então solicitamos que um aplicativo ou serviço qualquer nossos projetos e fazermos estimativas, por exemplo: o site demorará 42  horas para ser feito e queremos pagar 275,00 reais.
+
+| unfished | expected_hours | price |
+| -------- | -------------- | ----- |
+| 1        | 26             | 192   |
+| 1        | 88             | 9015  |
+| 1        | 89             | 2577  |
+| 1        | 42             | 275   |
+| 1        | 39             | 170   |
+
+Os dados que criamos para analisar o projeto representam o número de horas esperadas e o preço que um cliente está disposto a pagar por determinada tarefa, e queremos saber se algum desenvolvedor vai ou não realizar o trabalho. 
+
+Temos novamente um problema de classificação, mas dessa vez "horas esperadas" e "preço" são duas dimensões (*features*) que precisamos trabalhar. Conseguiremos visualizar essa informação de diversas maneiras diferentes, inclusive, entendendo como o algoritmo realiza as decisões dos projetos que serão ou não executados. 
+
+Por fim, teremos um projeto cujo foco da análise é a venda de alguns carros; a ideia é descobrirmos se determinados carros serão vendidos ou não com base no preço de cada um. Dessa forma, quando um cliente decide anunciar seu carro em site, podemos sugerir uma faixa de preço que facilitará o processo de venda. 
+
+Bolaremos maneiras de ilustrar o processo de classificação e então executá-lo cada vez de uma maneira diferente, com uma complexidade diferente.
+
+Vamos começar?
+
+# Preparando o ambiente
+
+# Olá
+
+Meu nome é Guilherme Silveira e neste curso vamos classificar e explorar alguns dados de forma descritiva utilizando o [pandas](http://pandas.pydata.org/pandas-docs/stable/) e visual utilizando o [Seaborn](http://seaborn.pydata.org/introduction.html).
+
+### Ambiente de análise
+
+Neste curso, usaremos uma ferramenta do Google chamada 
+
+[Colaboratory]() , que é um ambiente de notebook Jupyter que não requer configuração para usar.
+
+### Colaboratory
+
+Para usar este ambiente, é necessário ter uma conta **gmail**, pois todo notebook ficará armazenado no Drive.[Caso não tenha um gmail, faça o seu clicando neste link.](https://accounts.google.com/signup/v2/webcreateaccount?flowName=GlifWebSignIn&flowEntry=SignUp)
+
+Você pode acessar o Colaboratory [por esse link](https://colab.research.google.com).
+
+> Informação importante sobre o Colaboratory
+
+- O código do seu notebook é executado em uma máquina virtual dedicada à sua conta. As máquinas virtuais são recicladas por um determinado tempo ocioso ou caso a janela seja finalizada
+- Para restaurar seu notebook, talvez seja necessário refazer o upload do seu arquivo csv e executar as opções `Runtime` e `Restart and run all...`
+
+### Posso usar outro ambiente Jupyter notebook para realizar este curso?
+
+Sim, sem problemas. Caso queira utilizar o [Anaconda](https://www.anaconda.com/download) visto no curso de [pandas](https://cursos.alura.com.br/course/introducao-python-pandas) por exemplo você também pode.
+
+### Vamos começar?
+
+# O primeiro projeto
+
+Neste primeiro projeto, usaremos um exemplo ilustrativo para entendermos como funciona o machine learning. A ideia é diferenciar dois animais com características diferentes: um porco e um cachorro. 
+
+Se pensarmos nestas duas classes, podemos atribuir um número para cada uma delas como `1` e `0`.  Esse modelo binário pode ser utilizado das mais diferentes formas:  alguém que compra um produto ou não, uma pessoa que abandona ou não a escola e assim por diante. 
+
+Para compreendermos melhor essa ideia, analisaremos alguns exemplos. Temos uma tabela com diversas imagens de porcos e cachorros, e queremos classificá-las. Para cachorros, usaremos o número `0`, para porcos `1`.
+
+Como podemos fazer a máquina aprender o que é um porco e diferenciá-lo de um cachorro?  
+
+Faremos uma analogia com o nosso próprio desenvolvimento enquanto humanos:  normalmente, somos introduzidos ao animal diversas vezes e aprendemos por repetição. Associamos um som ao animal, algo como "oinc-oinc" para porcos, e destacamos suas características principais. Com o cachorro, não é diferente. Precisamos que alguém indique esse animal e nos ensine a classificação dele, enquanto esse aprendizado é supervisionado. Em suma, temos um "professor" que já sabe o que é um porco ou chachorro.
+
+Um processo parecido será feito com a máquina: passaremos um conjunto de dados e supervisionaremos seu aprendizado para que os animais sejam classificados de forma correta. Em seguida, exibiremos um animal novo e veremos como o algorítimo encaixa esse animal nas categorias disponíveis por meio de estimadores (**estimators**, em inglês).
+
+Mas como classificamos um animal entre cachorro ou porco? A ideia é usarmos características do animal - nesse caso, três. É importante destacar que quanto mais dados temos na fase de treino e aprendizado, há uma tendência de melhora do resultado dos estimadores, embora essa não seja uma garantia.
+
+Vamos analisar o primeiro exemplar de porco:
+
+1.há um pelo razoavelmente longo 2.as pernas são curtas 3.ele não emite o som "au-au".
+
+![porco de pelagem longa e amarronzada com o focinho sobre a grama](https://s3.amazonaws.com/caelum-online-public/1033-ml-class-intro-pt/01/1_2_2_porco.png)
+
+Cada animal será descrito por meio dessas três características: se o pelo é longo ou curto; se as pernas são longas ou curtas; e se o animal emite o som "au-au" ou não.
+
+Temos três *features* para nos auxiliar com esse processo de catalogação e treinar o estimador de forma que ele entenda padrões. No caso deste porco, ele possui pelo longo, então marcaremos na coluna "Pelo longo?" o número `1` ("sim"). Da mesma forma, marcaremos a mesma numeração na coluna "Perna curta?", e `0` (não") na coluna "Au Au?". 
+
+Na tabela abaixo, temos 6 exemplos de animais com suas *features* devidamente catalogadas. Repare que temos, por exemplo, tanto porcos quanto cachorros de pelo longo, além de um porco que faz "Au au".
+
+| Animal | Pelo Longo? | Perna curta? | Au Au? | 0 cão or 1 porco? |
+| ------ | ----------- | ------------ | ------ | ----------------- |
+| pig A  | 1           | 1            | 0      | 1                 |
+| pig B  | 0           | 1            | 1      | 1                 |
+| pig C  | 0           | 1            | 0      | 1                 |
+| dog A  | 0           | 1            | 1      | 0                 |
+| dog B  | 1           | 1            | 1      | 0                 |
+| dog C  | 0           | 0            | 1      | 0                 |
+
+Temos três características (*features*) com as quais treinaremos o nosso estimador capaz de entender padrões. As colunas de *features*, que são três, costumamos chamar de **X\*, e a coluna que classificao animal é chamada de *Y**. Neste caso, cada linha da coluna representa um animal, mas poderíamos estar classificando e-mails, clientes, produtos, etc.
+
+A seguir, temoso desenho de um animal que não tem pelo longo, possui pernas curtas e não faz "au-au", (`0,1,0`) - ou seja, trata-se, neste caso, de um porco. 
+
+![representação gráfica de um porco, sem pelos e de cor rosa](https://s3.amazonaws.com/caelum-online-public/1033-ml-class-intro-pt/01/1_2_4_desenho+de+um+porco.png)
+
+O importante é treinarmos o estimador e o tornarmos eficiente. Em nosso caso, usaremos uma medida para saber o quanto ele acerta, isto é a acurácia (**accuracy** em inglês), afinal há uma taxa de erro e não é sempre que os estimadores classificarão corretamente um animal. Lembrando que essa metodologia também poderia ser aplicada a outros tipos de classificação. 
+
+A previsão que faremos usa **algoritmos de classificação**. Esses algorítimos podem ser utilizados para classificar itens ou prever comportamentos de usuário no momento de comprar um produto, por exemplo. Para isso teremos:
+
+1.Features2.Itens3.Treino do estimador4.Testes5.Taxa de acerto6.Otimização7.Previsão
+
+Faremos tudo isso utilizando Python e a biblioteca **scikit-learn**, que possui os algorítimos de machine learning. Além disso, usaremos também o Numpy, e Graphviz e Seaborn para visualização dos nossos dados.
+
+Vamos começar o projeto?
+
+# Primeiro treino e teste de um modelo de classificação
+
+Neste primeiro projeto, trabalharemos com o exemplo da classificação de animais entre porcos e cachorros. Utilizando a linguagem Python, criaremos uma variável para cada animal, abrigando um conjunto (*array*) de valores, isto é, as *features*. Teremos três características: pelo curto ou longo, se as pernas são curtas ou longas, e se o animal emite ou não o som "au-au". Para cada uma das features, `1`= sim  e `0`= não.
+
+O animal `porco1` possui pelo curto, perna curta, e não emite o som "au-au", então teremos valores `[0, 1, 0]`. Já `porco2` possui pelo curto, perna curta, mas emite o som "au-au", logo os valores serão `[0,1,1]`. Por fim teremos `porco3` com o conjunto de valores `[1, 1, 0]`
+
+```
+# features (1 sim, 0 não)
+# pelo longo? 
+# perna curta?
+# faz auau?
+porco1 = [0, 1, 0]
+porco2 = [0, 1, 1]
+porco3 = [1, 1, 0]
+```
+
+Aplicaremos a mesma metodologia para cachorros. Temos `cachorro1` com um conjunto de valores `[0, 1, 1]`, `cachorro2` com `[1, 0, 1]` e `cachorro3` possui `[1, 1, 1]`. 
+
+```
+# features (1 sim, 0 não)
+# pelo longo? 
+# perna curta?
+# faz auau?
+porco1 = [0, 1, 0]
+porco2 = [0, 1, 1]
+porco3 = [1, 1, 0]
+
+cachorro1 = [0, 1, 1]
+cachorro2 = [1, 0, 1]
+cachorro3 = [1, 1, 1]
+```
+
+Podemos executar esse código pressionando o botão "Play" na tela ou "Shift + Enter", mas nada será impresso, a não ser que adicionemos, por exemplo, `print(porco1)` e ai teremos no console o valor `[0, 1, 0]`. Contudo não é do nosso interesse realizar esse processo no momento. 
+
+Temos duas tabelas que comportam porcos e cachorros, estes serão os nossos `dados`. Sabemos qual classe pertence da um desses dados, isto é, temos a classe  "porco", que atribuiremos o valor `1`, e a classe "cachorro", com o valor `0`.
+
+```
+# features (1 sim, 0 não)
+# pelo longo? 
+# perna curta?
+# faz auau?
+porco1 = [0, 1, 0]
+porco2 = [0, 1, 1]
+porco3 = [1, 1, 0]
+
+cachorro1 = [0, 1, 1]
+cachorro2 = [1, 0, 1]
+cachorro3 = [1, 1, 1]
+
+# 1 => porco, 0 => cachorro
+dados = [porco1, porco2, porco3, cachorro1, cachorro2, cachorro3]
+classes = [1,1,1,0,0,0]
+```
+
+Queremos criar um mecanismo que consiga estimar a classe desse tipo de dado. Para isso, usaremos algorítimos de *machine learning*, *data analysis* e estatística que estão armazenados nas diversas bibliotecas do Python. A que usaremos se chama  [**Scikit Learn**](https://scikit-learn.org/stable/).  
+
+Do módulo `sklearn.svm`, importaremos um estimador chamado `LinearSVC`. Posteriomente, entraremos em mais detalhes sobre alguns estimadores existentes e o que cada um é capaz de realizar. Por enquanto, usaremos esse estimador básico. 
+
+```
+from sklearn.svm import LinearSVC
+```
+
+O `LinearSVC` é uma classe que possibilita a criação de um modelo. Portanto, instanciaremos esse estimador (recebendo o nome `model`), e solicitaremos que ele analise a aprenda com os dados que disponibilizamos. Assim como um ser humano aprende sobre a classificação dos objetos no mundo de forma supervisionada, o modelo tentará adaptar sua lógica de pensamento com base nos dados. O método utilizado para esta ação chama-se `fit()`, que receberá como parâmetro `dados`, mas como estamos realizando um **aprendizado supervisionado**, devemos também declarar quais são as classes. 
+
+```
+from sklearn.svm import LinearSVC
+
+model = LinearSVC()
+model.fit(dados, classes)
+```
+
+Ao executarmos nosso código, teremos o resultado do modelo:
+
+```
+LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
+     intercept_scaling=1, loss='squared_hinge', max_iter=1000,
+     multi_class='ovr', penalty='l2', random_state=None, tol=0.0001,
+     verbose=0)
+```
+
+Agora dicionaremos um `animal_misterioso`, isto é, um ainda não identificado, com o valor `[1,1,1]` (com pelo logo, patas longas e emite o som "au-au").  A ideia é descobrir qual é a opinião do nosso modelo a respetio da categorização deste animal. Para tanto, usaremos o método `predict()` que receberá `animal_misterioso`.
+
+```
+animal_misterioso = [1,1,1]
+model.predict(animal_misterioso)
+```
+
+Ao executarmos o código teremos uma mensagem de erro: `ValueError: Expected 2D array, got 1D array instead`. Ou seja, é esperado um array de duas dimensões, enquanto tivemos apenas uma. O `predict()` espera um array com vários itens, neste caso temos apenas um. Então passaremos uma lista com um item, que por sua vez possui três features. 
+
+```
+animal_misterioso = [1,1,1]
+model.predict([animal_misterioso])
+```
+
+Executaremos o código e teremos como resultado `array([0])`, isto é, cachorro. 
+
+Podemos fazer o mesmo procedimento com diversos animais: criaremos `misterio1` , `misterio2`  e  `misterio3`  cujos valores serão, respectivamente, `[1,1,1]`,`[1,1,0]` e `[0,1,1]`.  Trataremos todos esses casos como `teste`, e acionaremos o método `predict()`.
+
+```
+misterio1 = [1,1,1]
+misterio2 = [1,1,0]
+misterio3 = [0,1,1]
+
+testes = [misterio1, misterio2, misterio3]
+model.predict(testes)
+```
+
+Ao executarmos o código, teremos como resultado `([0, 1, 0])`, isto é, cachorro, porco e cachorro. Mas, na verdade, esses animais já tinham uma classe definida que não foi revelada antes do teste: se tratavam de um cachorro e dois porcos (`[0,1,1]`). Neste caso, o algorítimo errou 1 de 3. Qual sua taxa de acerto então?
+
+A taxa de acerto é uma das medidas mais básicas de um modelo, e serve para analisarmos quantas classificações o nosso algorítimo foi capaz de acertar dentro de um determinado conjunto de daods.
+
+Vamos atribuir o resultado da previsao (`predict()`) a uma variável, que chamaremos de `previsoes` (e que equivalem a `[0, 1, 0]`). O valor real, que tínhamos previamente, será chamado de`teste_classes`.
+
+```
+misterio1 = [1,1,1]
+misterio2 = [1,1,0]
+misterio3 = [0,1,1]
+
+testes = [misterio1, misterio2, misterio3]
+previsoes = model.predict(testes)
+
+testes_classes = [0, 1, 1]
+```
+
+Após executarmos esse código, podemos extrair o valor de cada variável escrevendo somente o nome dela na área de trabalho. Se escrevermos `previsoes`, por exemplo, obteremos `[0, 1, 0]`; já se escrevermos `testes_classes`, teremos `[0, 1, 1]`.
+
+Ao executarmos o código, teremos as `previsões` de `[0, 1, 0]`. Se executarmos sem o print, é exibido o resultado da última linha:  
+
+Nosso objetivo é coletar os elementos desses arrays e compará-los um a um. Portanto, escreveremos `previsoes == testes_classes` e teremos o seguinte resultado: 
+
+```
+array([ True, True, False])
+```
+
+Por que isso ocorreu? Na verdade, `previsoes` não é uma lista do Python, mas `testes_classes` sim. A variável `previsoes` é um array, pois o Scikit-learn utiliza internamente a biblioteca **Numpy**, que por sua vez facilita diversos processos numéricos, entre eles a comparação de elementos. Por isso, basta simplesmente compararmos as duas arrays (`previsoes == testes_classes`) e teremos como resposta um outro array do Numpy (`array([ True, True, False])`) que contém os verdadeiros e falsos. O interessante é que podemos ainda somar um array do Numpy, evocando o método (`sum()`): 
+
+```
+corretos = (previsoes == testes_classes).sum()
+```
+
+Sabemos que o resultado será `2`, mas esse valor não será impresso porque trata-se de uma atribuição. Em seguida, inseriremos o tamanho de `testes`, isto é `len(testes)`, atribuindo esse valor a uma variável `total`. A `taxa_de_acerto` será `corretos/total` (o número de previsões corretas dividido pelo total de previsões), e então imprimimos o resultado utilizando `print("Taxa de acerto: ", taxa_de_acerto)`.
+
+```
+corretos = (previsoes == testes_classes).sum()
+total = len(testes)
+taxa_de_acerto = corretos/total
+print("Taxa de acerto ", taxa_de_acerto)
+```
+
+Na tela, teremos o resultado `Taxa de acerto: 0.666666666666666`. Como gostaríamos de analisar esse número em termos de porcentagem, multiplicaremos esse valor por 100:
+
+```
+corretos = (previsoes == testes_classes).sum()
+total = len(testes)
+taxa_de_acerto = corretos/total
+print("Taxa de acerto ", taxa_de_acerto *100)
+```
+
+Nosso resultado passará a ser `66.66` como taxa de acerto.
+
+Temos um modelo que foi treinado com os dados e imprimimos a taxa de acerto, contudo muitas vezes o código que executamos será feito em outros projetos para avaliar a taxa de acerto dos algorítimos. Nas bibliotecas comuns do Python, como o scikit-learn, existem funções que tentam medir a taxa de acerto. 
+
+Essa taxa de acerto, em inglês, é chamada de *accuracy* (em português, "acurácia"). Existe uma medida, a `accuracy_score`, que já existe no Sklearn e pode ser importada facilmente do módulo `metrics`:
+
+```
+from sklearn.metrics import accuracy_score
+```
+
+Ao pesquisarmos, por exemplo, "Sklearn accuracy score", acharamos facilmente na [documentação do Sklearn](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html)  o `sklearn.metrics.accuracy_score`, com explicações detalhadas e exemplos de uso. 
+
+Em nosso caso, estipularemos que `taxa_de_acerto` será a nota atribuída pelo `accuracy_score`, que receberá como parâmetros primeiramente os valores verdadeiros e depois os previstos, como podemos verificar na documentação. Logo: 
+
+```
+from sklearn.metrics import accuracy_score
+
+taxa_de_acerto = accuracy_score(testes_classes, previsoes)
+print("Taxa de acerto", taxa_de_acerto * 100)
+66.66
+```
+
+# Padronização de nomes
+
+Já criamos um modelo que foi treinado e testado, mas alguns nomes de variáveis precisam ser refinados. Temos seis itens diferentes, e cada um deles possui três features divergentes. Tais itens foram inseridos em um conjunto que chamamos de `dados`.
+
+```
+# features (1 sim, 0 não)
+# pelo longo?
+# perna curta?
+# faz auau? 
+
+porco1 = [0, 1, 0]
+porco2 = [0, 1, 1]
+porco3 = [1, 1, 0]
+
+cachorro1 = [0, 1, 1]
+cachorro2 = [1, 0, 1]
+cachorro3 = [1, 1, 1]
+
+# 1 => porco, 0 => cachorro
+dados = [porco1, porco2,  porco3, cachorro1, cachorro2, cachorro3]
+classes = [1,1,1,0,0,0]
+```
+
+Porém, `dados` é um nome muito genérico. Literalmente qualquer coisa pode ser chamada de "dado", como o nome de um modelo de celular, por exemplo. De forma geral, os dados, que constituem um conjunto de features que serão analisados, são pensados como uma função matemática - ou seja, o modelo funciona como uma função matemática.
+
+Portanto, chamaremos nosso modelo de `f()` e passaremos para ele os dados(`x`). O modelo nos devolverá `y`, isto é, a classe. Dessa forma, `f(x) = y`. 
+
+Contudo, o `x`  e `y` estão sendo usados somente para treinar o algorítimo. Logo, usaremos os nomes `treino_x` e `treino_y`. Em inglês, é comum encontrar esses nomes como `train_x` e `train_y`. As classes muitas vezes são chamadas de *labels*, ou seja, etiquetas,  afinal teremos classificações para cada um dos itens analisados.
+
+```
+# 1 => porco, 0 => cachorro
+treino_x = [porco1, porco2,  porco3, cachorro1, cachorro2, cachorro3]
+treino_y = [1,1,1,0,0,0] # labels / etiquetas
+```
+
+Adiante seguiremos alterando `dados` e `classes` para `treino_x` e `treino_y_`.
+
+```
+from sklearn.svm import LinearSVC
+
+model = LinearSVC()
+model.fit(treino_x, treino_y)
+```
+
+Adiante teremos: 
+
+```
+misterio1 = [1,1,1]
+misterio2 = [1,1,0]
+misterio3 = [0,1,1]
+
+testes = [misterio1, misterio2, misterio3]
+previsoes = model.predict(testes)
+
+teste_classes = [0, 1, 1]
+```
+
+Alteraremos `testes` para `x` , o padrão que temos para funções. Mas dessa vez não estamos mais treinando o algorítimo, e sim o testando, portanto usaremos `teste_x`. Modificaremos, ainda, `teste_classes` para `teste_y`.
+
+```
+misterio1 = [1,1,1]
+misterio2 = [1,1,0]
+misterio3 = [0,1,1]
+
+teste_x = [misterio1, misterio2, misterio3]
+previsoes = model.predict(testes)
+
+teste_y = [0, 1, 1]
+```
+
+Para não tornarmos nosso código confuso, alocaremos `teste_y`- as classes atreladas a cada item - para mais próximo de `teste_x`. Mais abaixo estarão localizadas as `previsoes` que serão realizadas por meio de  `teste_x`. 
+
+```
+misterio1 = [1,1,1]
+misterio2 = [1,1,0]
+misterio3 = [0,1,1]
+
+teste_x = [misterio1, misterio2, misterio3]
+teste_y = [0, 1, 1]
+
+previsoes = model.predict(teste_x)
+```
+
+Mais adiante no código, temos a comparação entre `previsoes` e `teste_classe`, que alteraremos para `teste_y`. Além disso, modificaremos `len(testes)` para `len(teste_x)`
+
+```
+corretos = (previsoes == teste_y).sum()
+total = len(teste_x)
+taxa_de_acerto = corretos/total 
+print("Taxa de acerto: ", taxa_de_acerto * 100)
+```
+
+Adiante, alteraremos `testes_classes` para `teste_y`:
+
+```
+from sklearn.metrics import accuracy_score
+
+taxa_de_acerto = accuracy_score(teste_y, previsoes)
+print("Taxa de acerto", taxa_de_acerto * 100)
+```
+
+Devemos executar todos os códigos novamente. Para isso, podemos simplesmente ir até o topo do documento e, segurando "Shift", pressionar várias vezes a tecla "Enter". 
+
+Porém, uma boa prática é reinicializarmos o *runtime* para apagarmos as variáveis que haviam sido criadas no Python anteriormente.  Faremos isso clicando em "*Runtime > Restart Runtime*" no cabeçalho. Na janela de verificação que se abre, clicaremos em "Ok". Desse modo, pressionaremos o "Shift + Enter" várias vezes para executar cada bloco de código em sequência. 
+
+Faremos uma pequena alteração na impressão do resultado da taxa de acerto, inserindo a formatação de ponto flutuante com duas casas decimais:
+
+```
+corretos = (previsoes == teste_y).sum()
+total = len(teste_x)
+taxa_de_acerto = corretos/total 
+print("Taxa de acerto %.2f " % (taxa_de_acerto * 100))
+from sklearn.metrics import accuracy_score
+
+taxa_de_acerto = accuracy_score(teste_y, previsoes)
+print("Taxa de acerto %.2f " % (taxa_de_acerto * 100))
+```
+
+# Treinando
+
+Lúcio começou a estudar sobre aprendizado de máquina (machine learning) na Alura para, no futuro, trabalhar como analista de dados. Ele aprendeu que,  para que o aprendizado da máquina seja eficiente,  é necessário treinar o algoritmo em uma determinada ordem.
+
+Qual é a ordem correta para treinar o algoritmo?
+
+Definir
+ um modelo de treino,  definir uma lista com dados para treino e dados 
+com os resultados esperados,  treinar com base na lista de dados e nos 
+resultados esperados.
+Com a definição do modelo para treino e com as listas de dados para treino e para teste,  nós conseguimos efetuar o treinamento.
+
+Nessa aula aprendemos a:
+
+- Treinar algoritmos;
+- Definir características (features) do que desejamos classificar;
+- Classificar em categorias;
+- Utilizar o módulo **linearSVC** e **accuracy_score**;
+- Utilizar o método **fit**;
+- Prever dados com a função **predict**;
+- Calcular a taxa de acerto do modelo;
+- Comparar testes e previsões;
+- Utilizar a função **soma**;
+- Padronizar variáveis;
